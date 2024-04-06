@@ -12,7 +12,7 @@ const oauth2Client = new OAuth2(
 
 
 oauth2Client.setCredentials({
-  // refresh_token: "1//04AruWOtl-2SlCgYIARAAGAQSNwF-L9Ir1TG8Q8nxj77AIvz-n5PRRhjCoTuUJrdMiG7civftpfe70hXy75iMafLcu4ZUGn-mGlw"
+  refresh_token: "1//04AruWOtl-2SlCgYIARAAGAQSNwF-L9Ir1TG8Q8nxj77AIvz-n5PRRhjCoTuUJrdMiG7civftpfe70hXy75iMafLcu4ZUGn-mGlw"
 });
 export async function SendMails(data) {
   const access_token = await oauth2Client.getAccessToken()
@@ -25,7 +25,7 @@ export async function SendMails(data) {
           clientId: process.env.CLIENT_ID,
           clientSecret: process.env.CLIENT_SECRET,
           accessToken : access_token.token,
-          // refresh_token: "1//04AruWOtl-2SlCgYIARAAGAQSNwF-L9Ir1TG8Q8nxj77AIvz-n5PRRhjCoTuUJrdMiG7civftpfe70hXy75iMafLcu4ZUGn-mGlw"
+          refresh_token: "1//04AruWOtl-2SlCgYIARAAGAQSNwF-L9Ir1TG8Q8nxj77AIvz-n5PRRhjCoTuUJrdMiG7civftpfe70hXy75iMafLcu4ZUGn-mGlw"
         },
         tls: {
           rejectUnauthorized: false
