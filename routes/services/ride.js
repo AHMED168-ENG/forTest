@@ -622,6 +622,35 @@ router.post('/new-ride-request' , addNormalRide() , handel_validation_errors , v
     }
 })
 
+router.get('/get-expected-price/:ride_id', verifyToken, async (req, res, next) => {
+
+    try {
+
+        const { language } = req.headers
+        const { ride_id } = req.params
+        const ride = await ride_model.findOne({_id : ride_id , user_id : req.user.id})
+        const info = await app_manager_model.findOne({}).select('step_value')
+
+        const origin = `${parseFloat(ride.user_lat)},${parseFloat(ride.user_lng)}`;
+        const destination = `${parseFloat(ride.location.coordinates[0])},${parseFloat(ride.location.coordinates[1])}`;
+        
+        const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=AIzaSyB0BtWBSQYdjvND0zL17L3dNdPJWZbG0EY`;
+          const response = await axios.get(url);
+          const distance = response.data.rows[0].elements[0].distance.text;
+          let price = 0
+          console.log(distance)
+        if(distance.indexOf("km") != -1) {
+            price = parseInt(distance) * info.step_value
+        } else {
+            price = (parseInt(distance) / 1000) * info.step_value
+        }
+        
+        res.json({ 'status': true , price});
+    } catch (e) {
+        next(e)
+    }
+})
+
 router.get('/rider-request' , getLocation() , handel_validation_errors , verifyToken, async (req, res, next) => {
 
     try {
