@@ -76,8 +76,8 @@ const schema = new Schema({
     monthly_contest_reward: { type: Number, default: 0 },
     instant_pay_number: { type: String },
     high_cost_per_kilo: { type: Number , default : 5 }, // this for hight price per mail  
+    price_per_km : {type: Number , default : 4 },
     low_cost_per_kilo: { type: Number , default : 3 }, // this for lowest price per mail 
-
     ride_request_cash_back : {type : Boolean , default : true}
     
 }, { versionKey: false, timestamps: true })

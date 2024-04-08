@@ -155,12 +155,13 @@ router.post('/get-high-low-price', async (req, res, next) => {
 
 
         const extraPrice = category == scooterCategoryId ? 5 : 10
+        const info = await app_manager_model.findOne({}).select('price_per_km')
 
         res.json({
             'status': true,
             'data': {
-                'high': parseFloat((high ? high.pricing_per_km : (category == scooterCategoryId ? 2.5 : 4)) * (parseFloat(distance) + 1.5)) + extraPrice,
-                'low': parseFloat((low ? low.pricing_per_km : (category == scooterCategoryId ? 2.5 : 4)) * (parseFloat(distance) + 1.5)) + extraPrice,
+                'high': parseFloat((high ? high.pricing_per_km : (category == scooterCategoryId ? 2.5 : info.price_per_km)) * (parseFloat(distance) + 1.5)) + extraPrice,
+                'low': parseFloat((low ? low.pricing_per_km : (category == scooterCategoryId ? 2.5 : info.price_per_km)) * (parseFloat(distance) + 1.5)) + extraPrice,
             }
         })
     } catch (e) {
@@ -638,11 +639,10 @@ router.get('/get-expected-price/:ride_id', verifyToken, async (req, res, next) =
           const response = await axios.get(url);
           const distance = response.data.rows[0].elements[0].distance.text;
           let price = 0
-          console.log(distance)
         if(distance.indexOf("km") != -1) {
-            price = parseInt(distance) * info.step_value
+            price = parseInt(distance) * info.price_per_km
         } else {
-            price = (parseInt(distance) / 1000) * info.step_value
+            price = (parseInt(distance) / 1000) * info.price_per_km
         }
         
         res.json({ 'status': true , price});
