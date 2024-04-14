@@ -623,7 +623,6 @@ router.post('/new-ride-request' , addNormalRide() , handel_validation_errors , v
     }
 })
 
-
 router.post('/accept-ride-request/:requestId' , verifyToken, async (req, res, next) => {
     try {
 
@@ -764,7 +763,6 @@ router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors
           const duration = response.data.rows[0].elements[0].duration.text;
           let price = 0
         if(distance.indexOf("km") != -1) {
-            console.log(parseFloat(distance.replaceAll("," , "")))
 
             price = parseFloat(distance.replaceAll("," , "")) * info.price_per_km
         } else {
@@ -776,9 +774,31 @@ router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors
     }
 })
 
-
-https://www.google.com/maps/dir/30.1472234,31.2965786/30.1086209,31.2622463/@30.1095861,31.3176929,13z/data=!4m2!4m1!3e3?entry=ttu
-
+router.get('/tracking-route/:requestId' , async (req, res, next) => {
+    try {
+        const { requestId } = req.params
+        const { language } = req.headers
+        const ride = await ride_model.findOne({_id : requestId}).populate("rider_id")
+        if(!ride) return next({ 'status': 404, 'message': language == 'ar' ? "هذه الطلب غير موجود " : 'This request does not exist' })
+        if(!ride.rider_id) return next({ 'status': 404, 'message': language == 'ar' ? "هذه الطلب غير مزود بخادم" : 'This request is not server-served' })
+        const origin  = `${parseFloat(ride.rider_id.location.coordinates[1])},${parseFloat(ride.rider_id.location.coordinates[0])}`;
+        const destination  = `${parseFloat(ride.location.coordinates[1])},${parseFloat(ride.location.coordinates[0])}`;
+        
+        const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=AIzaSyB0BtWBSQYdjvND0zL17L3dNdPJWZbG0EY`;
+          const response = await axios.get(url);
+          const distance = response.data.rows[0].elements[0].distance.text;
+          const duration = response.data.rows[0].elements[0].duration.text;
+          let distanceMt = 0
+        if(distance.indexOf("km") != -1) {
+            distanceMt += (parseFloat(distance) * 1000)
+        } else {
+            distanceMt += distance
+        } 
+        res.json({ 'status': true , distance : distanceMt , duration , ride_location : ride.rider_id.location});
+    } catch (e) {
+        next(e)
+    }
+})
 
 router.get('/rider-request' , getLocation() , handel_validation_errors , verifyToken, async (req, res, next) => {
 
