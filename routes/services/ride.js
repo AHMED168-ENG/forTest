@@ -703,7 +703,7 @@ router.post('/accept-ride-request/:requestId' , verifyToken, async (req, res, ne
 })
 
 
-router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors , verifyToken, async (req, res, next) => {
+router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors , async (req, res, next) => {
     try {
         const { user_longitude , user_latitude , location_longitude , location_latitude} = req.body
         const info = await app_manager_model.findOne({}).select('price_per_km')
