@@ -21,7 +21,7 @@ import pick_me_ride_model from '../../models/pick_me_ride_model.js';
 import axios from 'axios';
 import wallet_model from '../../models/wallet_model.js';
 import handel_validation_errors from '../../middleware/handelBodyError.js';
-import getLocation, { acceptRideOfferValidation, addNormalRide, addUserRating, changeRideOfferStatus, sendClientOfferValidation, sendRideValidation } from '../../validation/riders.js';
+import getLocation, { acceptRideOfferValidation, addNormalRide, addUserRating, changeRideOfferStatus, getExpectedPrice, sendClientOfferValidation, sendRideValidation } from '../../validation/riders.js';
 import { updateUserLocation } from '../../validation/user.js';
 import mongoose from 'mongoose';
 import { calculateDistance } from '../../utils/calculateDestance.js';
@@ -623,17 +623,15 @@ router.post('/new-ride-request' , addNormalRide() , handel_validation_errors , v
     }
 })
 
-router.get('/get-expected-price/:ride_id', verifyToken, async (req, res, next) => {
-
+router.get('/get-expected-price/:ride_id' , getExpectedPrice() , handel_validation_errors , verifyToken, async (req, res, next) => {
     try {
-
-        const { language } = req.headers
+        const { user_longitude , user_latitude , location_longitude , location_latitude} = req.body
         const { ride_id } = req.params
         const ride = await ride_model.findOne({_id : ride_id , user_id : req.user.id})
         if(!ride) return next("no ride")
         const info = await app_manager_model.findOne({}).select('price_per_km')
-        const origin = `${parseFloat(ride.user_lat)},${parseFloat(ride.user_lng)}`;
-        const destination = `${parseFloat(ride.location.coordinates[0])},${parseFloat(ride.location.coordinates[1])}`;
+        const origin = `${parseFloat(user_latitude)},${parseFloat(user_longitude)}`;
+        const destination = `${parseFloat(location_latitude)},${parseFloat(location_longitude)}`;
         
         const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=AIzaSyB0BtWBSQYdjvND0zL17L3dNdPJWZbG0EY`;
           const response = await axios.get(url);

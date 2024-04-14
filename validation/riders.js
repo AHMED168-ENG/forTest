@@ -142,6 +142,27 @@ export function addNormalRide() {
     ];
   }
 
+export function getExpectedPrice() {
+    return [
+      check("user_longitude").notEmpty().withMessage(JSON.stringify({
+        ar: "قم بادخال خط الطول",
+        en: "Enter longitude"
+      })),
+        check("user_latitude").notEmpty().withMessage(JSON.stringify({
+          ar: "قم بادخال خط الطول",
+          en: "Enter latitude"
+      })),
+      check("location_longitude").notEmpty().withMessage(JSON.stringify({
+        ar: "قم بادخال خط الطول",
+        en: "Enter longitude"
+      })),
+        check("location_latitude").notEmpty().withMessage(JSON.stringify({
+          ar: "قم بادخال خط الطول",
+          en: "Enter latitude"
+      })),
+    ];
+  }
+
   
 
 
