@@ -595,7 +595,7 @@ router.post('/new-ride-request' , addNormalRide() , handel_validation_errors , v
     try {
 
         const { language } = req.headers
-        const { car_model_year, air_conditioner, category_id, from, to, time, user_lat, user_lng, destination_lat, destination_lng, price, passengers } = req.body
+        const { car_model_year, air_conditioner, category_id, from, to, time, user_lat, user_lng, destination_lat, destination_lng, price, passengers , auto_accept = false } = req.body
         const info = await app_manager_model.findOne({}).select('ride_request_cash_back')
 
         const subCateogry = await sub_category_model.findOne({ _id: category_id, is_hidden: false, }).select('parent name_ar name_en parent')
@@ -636,13 +636,14 @@ router.get('/get-expected-price/:ride_id' , getExpectedPrice() , handel_validati
         const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=AIzaSyB0BtWBSQYdjvND0zL17L3dNdPJWZbG0EY`;
           const response = await axios.get(url);
           const distance = response.data.rows[0].elements[0].distance.text;
+          const duration = response.data.rows[0].elements[0].duration.text;
           let price = 0
         if(distance.indexOf("km") != -1) {
             price = parseInt(distance) * info.price_per_km
         } else {
             price = (parseInt(distance) / 1000) * info.price_per_km
-        }
-        res.json({ 'status': true , price});
+        } 
+        res.json({ 'status': true , price  , distance , duration});
     } catch (e) {
         next(e)
     }
