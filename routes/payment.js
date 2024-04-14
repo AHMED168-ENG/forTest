@@ -59,7 +59,7 @@ router.post('/callback', async (req, res, next) => {
                         text_ar: bodyAr,
                         text_en: bodyEn,
                         receiver_id: user.id,
-                        tab: 1,
+                        tab: 1, 
                         user_id: sender.id,
                         type: 9,
                         direction: sender.id,
@@ -70,10 +70,10 @@ router.post('/callback', async (req, res, next) => {
                     auth_model.find({ user_id: user.id }).distinct('fcm').then(fcm => {
                         if (fcm.length > 0) {
                             sendNotifications(
-                                fcm,
+                                fcm, 
                                 user.language == 'ar' ? titleAr : titleEn,
                                 user.language == 'ar' ? bodyAr : bodyEn,
-                                9,
+                                9,      
                                 sender.id,
                             )
                         }

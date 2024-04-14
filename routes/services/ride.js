@@ -630,8 +630,8 @@ router.get('/get-expected-price/:ride_id', verifyToken, async (req, res, next) =
         const { language } = req.headers
         const { ride_id } = req.params
         const ride = await ride_model.findOne({_id : ride_id , user_id : req.user.id})
-        const info = await app_manager_model.findOne({}).select('step_value')
-
+        if(!ride) return next("no ride")
+        const info = await app_manager_model.findOne({}).select('price_per_km')
         const origin = `${parseFloat(ride.user_lat)},${parseFloat(ride.user_lng)}`;
         const destination = `${parseFloat(ride.location.coordinates[0])},${parseFloat(ride.location.coordinates[1])}`;
         
@@ -644,7 +644,6 @@ router.get('/get-expected-price/:ride_id', verifyToken, async (req, res, next) =
         } else {
             price = (parseInt(distance) / 1000) * info.price_per_km
         }
-        
         res.json({ 'status': true , price});
     } catch (e) {
         next(e)

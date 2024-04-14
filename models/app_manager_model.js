@@ -60,15 +60,13 @@ const schema = new Schema({
     ride_technical_examination_center_location: { type: String },
     ride_drug_analysis_center_phone: { type: String },
     ride_drug_analysis_center_location: { type: String },
-    /////////
 
     gift_gross_money: { type: Number, default: 0 },
     gift_portion: { type: Number, default: 0 },
     gift_provider_portion: { type: Number, default: 0 },
     gift_payment_factor: { type: Number, default: 0 },
     gift_over_head_factor: { type: Number, default: 0 },
-
-
+    
     ride_area_distance: { type: Number, default: 5000 },
     ride_request_duration: { type: Number, default: 10 },
     is_monthly_contest_available: { type: Boolean, default: false },
