@@ -764,11 +764,13 @@ router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors
           const duration = response.data.rows[0].elements[0].duration.text;
           let price = 0
         if(distance.indexOf("km") != -1) {
-            price = parseInt(distance) * info.price_per_km
+            console.log(parseFloat(distance.replaceAll("," , "")))
+
+            price = parseFloat(distance.replaceAll("," , "")) * info.price_per_km
         } else {
-            price = (parseInt(distance) / 1000) * info.price_per_km
+            price = (parseFloat(distance.replaceAll("," , "")) / 1000) * info.price_per_km
         } 
-        res.json({ 'status': true , price  , distance , duration});
+        res.json({ 'status': true , price  , distance : distance , duration});
     } catch (e) {
         next(e)
     }
