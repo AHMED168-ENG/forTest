@@ -755,7 +755,7 @@ router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors
     try {
         const { user_longitude , user_latitude , location_longitude , location_latitude} = req.query
         const info = await app_manager_model.findOne({}).select('price_per_km')
-        const origin = `${parseFloat(user_latitude)},${parseFloat(user_longitude)}`;
+        const origin  = `${parseFloat(user_latitude)},${parseFloat(user_longitude)}`;
         const destination = `${parseFloat(location_latitude)},${parseFloat(location_longitude)}`;
         
         const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=AIzaSyB0BtWBSQYdjvND0zL17L3dNdPJWZbG0EY`;
@@ -775,6 +775,10 @@ router.get('/get-expected-price' , getExpectedPrice() , handel_validation_errors
         next(e)
     }
 })
+
+
+https://www.google.com/maps/dir/30.1472234,31.2965786/30.1086209,31.2622463/@30.1095861,31.3176929,13z/data=!4m2!4m1!3e3?entry=ttu
+
 
 router.get('/rider-request' , getLocation() , handel_validation_errors , verifyToken, async (req, res, next) => {
 
@@ -1417,12 +1421,14 @@ router.get('/get-requests-offers' , verifyToken , async (req, res, next) => {
 
     try {
 
-        let {page = process.env.PAGE , limit = process.env.LIMIT} = req.query
+        let {page = process.env.PAGE , limit = process.env.LIMIT , ride_id} = req.query
+        const query = {to : new mongoose.Types.ObjectId(req.user.id)}
+        if(ride_id) {
+            query.ride_id = new mongoose.Types.ObjectId(ride_id)
+        }
         const aggregate = request_offer_model.aggregate([
             {   
-                $match : {
-                    to : new mongoose.Types.ObjectId(req.user.id)
-                }
+                $match : query
             },
             {
                 $lookup : {
