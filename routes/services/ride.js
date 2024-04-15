@@ -294,7 +294,25 @@ router.post('/update-phone', verifyToken, async (req, res, next) => {
 router.get('/rider-details', verifyToken, async (req, res, next) => {
 
     try {
-        const result = await rider_model.findOne({ user_id: req.user.id, is_approved: true, is_active: true })
+        const query = {is_approved: true, is_active: true }
+        if(req.query.userId) {
+            query.user_id = new mongoose.Types.ObjectId(req.query.userId)
+        } else {
+            query.user_id = new mongoose.Types.ObjectId(req.user.id) 
+        }
+        const result = await rider_model.aggregate([
+            {
+                $match : query
+            },
+            {
+                $lookup : {
+                    from : "ad_ratings",
+                    localField : "user_id",
+                    as : "rating",
+                    foreignField : "user_id"
+                }
+            },
+        ])
 
         res.json({
             'status': true,
@@ -515,9 +533,50 @@ router.get('/get-rider-rides', verifyToken, async (req, res, next) => {
 router.get('/client-request' , verifyToken, async (req, res, next) => {
 
     try {
-        const userRequest = await ride_model.find({
-            user_id : req.user.id
-        })
+        const userRequest = await ride_model.aggregate([
+            {
+                $match : {
+                    user_id : new mongoose.Types.ObjectId(req.user.id),
+                }
+            },
+            {
+                $lookup : {
+                    from : "users",
+                    localField : "user_id",
+                    as : "user_id",
+                    foreignField : "_id"
+                }
+            },
+            {
+                $unwind : {path  : "$user_id" , preserveNullAndEmptyArrays : true},
+            },
+            {
+                $lookup : {
+                    from : "riders",
+                    localField : "rider_id",
+                    as : "rider_id",
+                    foreignField : "_id"
+                }
+            },
+            {
+                $unwind : {path  : "$rider_id" , preserveNullAndEmptyArrays : true},
+            },
+            {
+                $lookup : {
+                    from : "ride_offers",
+                    localField : "_id",
+                    as : "ride_offer",
+                    foreignField : "ride_id",
+                    pipeline : [
+                        {
+                            $match : {
+                                is_accept : true
+                            }
+                        }
+                    ]
+                }
+            },
+        ])
         res.json({ 'status': true , data : userRequest});
     } catch (e) {
         next(e)
@@ -530,7 +589,7 @@ router.get('/client-request/:id' , verifyToken, async (req, res, next) => {
         const userRequest = await ride_model.aggregate([
             {
                 $match : {
-                    // user_id : new mongoose.Types.ObjectId(req.user.id),
+                    user_id : new mongoose.Types.ObjectId(req.user.id),
                     _id : new mongoose.Types.ObjectId(req.params.id)
                 }
             },
