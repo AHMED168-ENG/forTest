@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
 
     user_id: { type: mongoose.Schema.ObjectId, required: true , ref : "users" },
     rider_id: { type: mongoose.Schema.ObjectId , ref : "riders" },
-    category_id: { type: String, required: true },
+    category_id: { type: mongoose.Schema.ObjectId, required: true , ref : "sub_categories" },
     from: { type: String, required: true },
     to: { type: String, required: true },
     distance: { type: String, required: true },
@@ -24,16 +24,18 @@ const schema = new mongoose.Schema({
     is_start: { type: Boolean, default: false },
     is_completed: { type: Boolean, default: false },
     is_canceled: { type: Boolean, default: false },
-
+    
     passengers: { type: Number, default: 0 },
-
+    
     is_user_get_cashback : { type: Boolean, default: false },
     is_rider_get_cashback: { type: Boolean, default: false },
     phone : {type:String},
     auto_accept : {
         type: Boolean, default: false
-    }
-    
+    },
+    cancel_reason: { type: mongoose.Schema.ObjectId , ref: "cancelation_reasons" },
+    penalty: { type: Number , default : 0},
+    payed_penalty : { type: Boolean , default : false},
 
 }, { versionKey: false, timestamps: true })
 
